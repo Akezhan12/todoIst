@@ -27,6 +27,7 @@ export const App = () => {
     }, [immutTasks]);
 
     const onDeleteTask = useCallback((id) => {
+        console.log('hellow')
         const result = immutTasks.filter((task) => id !== task.id)
         setTasks(result);
         setImmutTasks(result);

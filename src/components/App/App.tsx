@@ -1,26 +1,42 @@
-import React from 'react';
-import logo from './logo.svg';
+import React, {useCallback, useEffect, useState} from 'react';
 import './App.scss';
+import { SearchInput } from '../SearchInput/component';
+import { ListItem } from '../ListItem/component';
+import { Task } from './types/Task';
+import { AddTask } from '../AddTask/component';
+import { uuid } from 'uuidv4';
 
-function App() {
+export const App = () => {
+    const [tasks, setTasks] = useState<Array<Task>>([]);
+    const [immutTasks, setImmutTasks] = useState<Array<Task>>([]);
+
+    const onSearch = useCallback((value) => {
+        if (value.length > 0) {
+            const result = immutTasks.filter(({ title }) => title.toLowerCase().startsWith(value));
+            setTasks(result);
+        } else {
+            setTasks(immutTasks);
+        }
+    }, [immutTasks, setTasks]);
+
+    const onAddTask = useCallback((title: string) => {
+        const result = [...immutTasks];
+        result.push({ title, completed: false, id: uuid()});
+        setImmutTasks(result);
+        setTasks(result);
+    }, [immutTasks]);
+
+    const onDeleteTask = useCallback((id) => {
+        const result = immutTasks.filter((task) => id !== task.id)
+        setTasks(result);
+        setImmutTasks(result);
+    },[immutTasks])
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div className="App container">
+          <SearchInput placeholder="azaaa" onSearch={onSearch} />
+      <ListItem tasks={tasks} onDeleteTask={onDeleteTask}  />
+      <AddTask onAddTask={onAddTask} />
     </div>
   );
 }
-
-export default App;
